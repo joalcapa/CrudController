@@ -4,7 +4,7 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
      *  GET ONE
      */
     middleware(app, api_version+modelType+'s/:id')
-    app.get(api_version+modelType+'s/:id', function (req, res) {
+    app.get(api_version+modelType+'s/:id', (req, res) => {
         model.findById(req.params.id)
         .then(modelResponse => {
             
@@ -23,7 +23,7 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
     /*  endpoint: /models
      *  GET ALL
      */
-    app.get(api_version+modelType+'s', function (req, res) {
+    app.get(api_version+modelType+'s', (req, res) => {
         model.findAndCountAll({
             where: {},
             offset: (req.query.page - 1) *   30,
@@ -43,7 +43,7 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
     /*  endpoint: /models
      *  POST CREATE
      */
-    app.post(api_version+modelType+'s', function (req, res) {
+    app.post(api_version+modelType+'s', (req, res) => {
         model.build(req.body)
             .save()
             .then(modelResponse => {
@@ -57,7 +57,7 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
     /*  endpoint: /models/:id
      *  DELETE DELETE
      */
-    app.delete(api_version+modelType+'s/:id', function (req, res) {
+    app.delete(api_version+modelType+'s/:id', (req, res) => {
         console.log('id: ', req.params.id)
         model.destroy({
             where: {
@@ -78,7 +78,7 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
     /*  endpoint: /models/:id
      *  PUT UPDATE
      */
-    app.put(api_version+modelType+'s/:id', function (req, res) {
+    app.put(api_version+modelType+'s/:id', (req, res) => {
         model.update(
             req.body,
             { where: { id: req.params.id }}
