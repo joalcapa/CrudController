@@ -1,3 +1,5 @@
+import { FilterWhere }     from '../handlers/handler'
+
 let CrudController = (app, middleware, api_version, modelType, model) => {
 
     /*  endpoint: /models/:id
@@ -25,12 +27,13 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
      */
     middleware(app, api_version+modelType+'s/')
     app.get(api_version+modelType+'s', (req, res) => {
+        let filter = req.query.filter != undefined ? req.query.filter : ''
         model.findAndCountAll({
-            where: {},
+            where: FilterWhere(modelType, filter),
             order: [
                 [
-                    req.query.sort[0],  // field
-                    req.query.sort[1]   // order (ASC, DESC)
+                    req.query.sort[0],
+                    req.query.sort[1]
                 ]
             ],
             offset: (req.query.page - 1) *   30,
