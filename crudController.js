@@ -16,16 +16,23 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
                 res.status(404).send({
                    message: modelType + ', does not exist'
                 })
-                
+
         }).catch(error => res.status(500).end())
     })
 
     /*  endpoint: /models
      *  GET ALL
      */
+    middleware(app, api_version+modelType+'s/')
     app.get(api_version+modelType+'s', (req, res) => {
         model.findAndCountAll({
             where: {},
+            order: [
+                [
+                    req.query.sort[0],  // field
+                    req.query.sort[1]   // order (ASC, DESC)
+                ]
+            ],
             offset: (req.query.page - 1) *   30,
             limit: 30
         })
@@ -37,6 +44,7 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
             responseModel['total'] = result.count
             responseModel['limit'] = 30
             res.send(JSON.stringify(responseModel))
+
         }).catch(error => res.status(500).end())
     })
     
@@ -47,9 +55,11 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
         model.build(req.body)
             .save()
             .then(modelResponse => {
+
                 let responseModel = {}
                 responseModel[modelType] = modelResponse
                 res.send(JSON.stringify(responseModel))
+
             })
             .catch(error => res.status(500).end())
     })
@@ -58,12 +68,12 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
      *  DELETE DELETE
      */
     app.delete(api_version+modelType+'s/:id', (req, res) => {
-        console.log('id: ', req.params.id)
         model.destroy({
             where: {
-                id: req.params.id
+                id: JSON.parse(req.params.id)
             }
         }).then(isDelete => {
+
             isDelete ? 
             res.send({
                 message: modelType + ', successfully deleted'
@@ -71,6 +81,7 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
             res.status(404).send({
                 message: modelType + ', does not exist'
             })
+
         })
         .catch(error => res.status(500).end())
     })
@@ -84,6 +95,7 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
             { where: { id: req.params.id }}
             )
             .then(isUpdate => {
+
                 if(isUpdate == 1) {
                     model.findById(req.params.id)
                     .then(modelResponse => {
@@ -96,6 +108,7 @@ let CrudController = (app, middleware, api_version, modelType, model) => {
                         message: modelType + ', does not exist'
                     })
                 }
+
             })
             .catch(error => res.status(500).end())
     })
